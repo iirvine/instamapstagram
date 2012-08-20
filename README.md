@@ -1,4 +1,4 @@
-leaflet-backboned
+instamapstagram
 =================
 
-Initial commit of a little leaflet + backbone boilerplate project.
+Instagram! On a map!! Whodathunkit.
