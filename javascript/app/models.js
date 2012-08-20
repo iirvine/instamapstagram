@@ -3,6 +3,8 @@ var App = App || {};
 //Abstracts:
 App.Feature = Backbone.Model.extend({
 	addTo: function(map) {
+		//not sure this belongs in the feature class, certainly not in the abstract... calling directly into 
+		//Leaflet here. maybe this is worth being an App level event?
 		this.feature.addTo(map);
 	},
 });
@@ -53,9 +55,14 @@ App.SearchRadius = App.Feature.extend({
 	}
 });
 
+App.Picture = App.Feature.extend({
+
+});
+
 App.PictureLayer = App.Layer.extend({
 
 });
+
 
 
 //App modules:

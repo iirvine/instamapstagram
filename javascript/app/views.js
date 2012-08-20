@@ -23,6 +23,7 @@ App.InstaMapView = App.MapView.extend({
 	},
 
 	placeLocationPin: function(e) {
+		//place pin at default view's center if locationerror
 		e.type !== 'locationerror' ? this.searchPin = new App.SearchPin(e.latlng)
 		: this.searchPin = new App.SearchPin(this.mapModule.map.getCenter())
 
