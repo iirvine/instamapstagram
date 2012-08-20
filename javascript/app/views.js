@@ -14,13 +14,21 @@ App.MapView = Backbone.View.extend({
 
 App.InstaMapView = App.MapView.extend({
 	initialize: function(options) {
-		//call superclass constructor...
 		App.MapView.prototype.initialize.call(this, options);
 		
-		//subclass specific stuff here....
+		App.vent.on('map:finishedLocate map:locateError', 
+			this.placeLocationPin, this);
+
 		App.vent.trigger('map:locate', { zoom: 12 });
-		App.vent.on('map:finishedLocate map:locateError', this.mapModule.placeLocationPin, this.mapModule);
 	},
 
-	
+	placeLocationPin: function(e) {
+		e.type !== 'locationerror' ? this.searchPin = new App.SearchPin(e.latlng)
+		: this.searchPin = new App.SearchPin(this.mapModule.map.getCenter())
+
+		this.searchPin.addTo(this.mapModule.map);
+
+		this.searchRadius = new App.SearchRadius({ location: e.latlng, searchPin: this.searchPin, radius: 2500 });
+		this.searchRadius.addTo(this.mapModule.map);
+	},
 });
