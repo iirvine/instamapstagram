@@ -39,6 +39,10 @@ App.SearchRadius = App.Feature.extend({
 	dragEnd: function(location) {
 		this.feature.setLatLng(location);
 	},
+
+	radius: function() {
+		return this.feature.radius;
+	}
 });
 
 

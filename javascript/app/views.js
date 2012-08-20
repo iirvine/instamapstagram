@@ -27,8 +27,14 @@ App.InstaMapView = App.MapView.extend({
 		: this.searchPin = new App.SearchPin(this.mapModule.map.getCenter())
 
 		this.searchPin.addTo(this.mapModule.map);
+		this.searchPin.on('searchPin:dragEnd', this.searchPinDragEnd, this);
 
 		this.searchRadius = new App.SearchRadius({ location: e.latlng, searchPin: this.searchPin, radius: 2500 });
 		this.searchRadius.addTo(this.mapModule.map);
+	},
+
+	searchPinDragEnd: function(e) {
+		console.log(e);
+		console.log(this.searchRadius.get('radius'));
 	},
 });
