@@ -11,16 +11,17 @@ App.Layer = Backbone.Collection.extend({
 	model: App.Feature,
 });
 
-App.Layers = Backbone.Model.extend({
-
-});
-
 //App classes:
 App.SearchPin = App.Feature.extend({
 	initialize: function(location) {
+		_.bindAll(this);
 		this.feature = new L.marker(location, { draggable : true });
-		_.bindAll(this, 'dragEnd');
 		this.feature.on('dragend', this.dragEnd);
+		this.feature.on('drag', this.onDrag);
+	},
+
+	onDrag: function(e) {
+		this.trigger('searchPin:drag', e.target._latlng);
 	},
 
 	dragEnd: function(e) {
@@ -29,14 +30,21 @@ App.SearchPin = App.Feature.extend({
 });
 
 App.SearchRadius = App.Feature.extend({
-	initialize: function(options) {
-		this.searchPin = options.searchPin;
-		this.feature = new L.Circle(options.location, options.radius);
-
-		this.searchPin.on('searchPin:dragEnd', this.dragEnd, this);
+	pathOptions: {
+		color: '#524B4E',
+		weight: 2,
+		opacity: 0.5,
+		fillOpacity: 0
 	},
 
-	dragEnd: function(location) {
+	initialize: function(options) {
+		this.searchPin = options.searchPin;
+		this.feature = new L.Circle(options.location, options.radius, this.pathOptions);
+
+		this.searchPin.on('searchPin:drag', this.onDrag, this);
+	},
+
+	onDrag: function(location) {
 		this.feature.setLatLng(location);
 	},
 
@@ -45,16 +53,20 @@ App.SearchRadius = App.Feature.extend({
 	}
 });
 
+App.PictureLayer = App.Layer.extend({
+
+});
+
 
 //App modules:
 App.MapModule = _.extend({}, {
-	createMap : function(element, initialView) {
+	createMap: function(element, initialView) {
 		this.map = L.map(element).setView(initialView.coords, initialView.zoom);
 		this.addBaseLayer();
 		return this.map;
 	},
 
-	addBaseLayer : function() {
+	addBaseLayer: function() {
 		this.addLayer(L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', 
 			{
 				key: "721f5fe14d2a4ae5bf8ecb6412263ce2",
@@ -62,11 +74,11 @@ App.MapModule = _.extend({}, {
 			}));
 	},
 
-	addLayer : function(layer) {
+	addLayer: function(layer) {
 		layer.addTo(this.map);
 	},
 
-	locate : function(options) {
+	locate: function(options) {
 		this.map.locate({ setView: true, maxZoom: options.zoom });
 		this.map.on('locationfound', 
 			function(e) { App.vent.trigger('map:finishedLocate', e); });
