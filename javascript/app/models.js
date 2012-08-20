@@ -1,51 +1,50 @@
 var App = App || {};
 
 //Abstracts:
+App.Feature = Backbone.Model.extend({
+
+});
+
+App.Layer = Backbone.Collection.extend({
+	model: App.Feature,
+});
 
 //App classes:
 
 
-//App modules:
-App.MapModule = (function () {
-	this.map;
 
-	var createMap = function(element, initialView) {
+//App modules:
+App.MapModule = _.extend({}, {
+	createMap : function(element, initialView) {
 		this.map = L.map(element)
 					.setView(initialView.coords, initialView.zoom);
 
 		this.addBaseLayer();
 		return this.map;
-	};
+	},
 
-	var addBaseLayer = function() {
+	addBaseLayer : function() {
 		this.addLayer(
 			L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', 
 			{
 				key: "721f5fe14d2a4ae5bf8ecb6412263ce2",
 				styleId: 22677
 			}));
-	};
+	},
 
-	var addLayer = function(layer) {
+	addLayer : function(layer) {
 		layer.addTo(this.map);
-	};
+	},
 
-	var locate = function(options) {
+	locate : function(options) {
 		this.map.locate({setView: true, maxZoom: options.zoom});
 		this.map.on('locationfound', 
 			function(e) { App.vent.trigger('map:finishedLocate', e); });
 
 		this.map.on('locationerror', 
 			function(e) { App.vent.trigger('map:locateError', e); });
-	};
-
-	return {
-		createMap: createMap,
-		addLayer: addLayer,
-		addBaseLayer: addBaseLayer,
-		locate: locate
-	}
-})();
+	},
+});
 
 App.InstaMapperModule = _.extend(App.MapModule, {
 	placeLocationPin: function(e) {

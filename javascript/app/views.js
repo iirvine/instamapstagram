@@ -21,4 +21,6 @@ App.InstaMapView = App.MapView.extend({
 		App.vent.trigger('map:locate', { zoom: 12 });
 		App.vent.on('map:finishedLocate map:locateError', this.mapModule.placeLocationPin, this.mapModule);
 	},
+
+	
 });
