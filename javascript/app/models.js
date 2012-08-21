@@ -131,6 +131,7 @@
 			return this.feature.getRadius();
 		},
 
+		//Override from base module.Feature
 		moveTo: function(location) {
 			this.searchPin.moveTo(location);
 			this.feature.setLatLng(location);
