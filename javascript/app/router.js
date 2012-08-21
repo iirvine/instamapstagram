@@ -5,12 +5,10 @@ App.Router = Backbone.Router.extend({
 		"": "index"
 	},
 
-	initialize: function() {		
-		App.vent.on('map:createMap', App.MapModule.createMap, App.MapModule);
-		App.vent.on('map:locate', App.MapModule.locate, App.MapModule);
-
+	initialize: function() {	
+		App.mapModule = new App.InstaMapperModule();
 		this.mapView = new App.InstaMapView({
-			mapModule: App.InstaMapperModule,
+			mapModule: App.mapModule,
 			collection: new App.PictureLayer(),
 			defaultView: { coords: [37.8, -96], zoom: 4 },
 		});

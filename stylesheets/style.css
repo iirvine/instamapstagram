@@ -6,3 +6,12 @@ body {
 html, body, #map {
 	height: 100%;
 }
+
+.search-radius-grabber {
+	background: red;
+	width: 15px !important;
+	height: 15px !important;
+	-moz-border-radius: 10em;
+	-webkit-border-radius: 10em;
+	border-radius: 10em;	
+}

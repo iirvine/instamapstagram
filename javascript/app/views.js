@@ -7,7 +7,11 @@ App.MapView = Backbone.View.extend({
 		if (options.el)
 			this.setElement(options.el);
 
+		//saving a reference to mapModule, just for convenience. 
 		this.mapModule = options.mapModule;
+
+		//I'm sort of liking the app level events, but they also seem like a bit of a code
+		//smell... maybe a bit more logic in the event aggregator? 
 		App.vent.trigger('map:createMap', this.el, options.defaultView);
 	},
 });
@@ -30,12 +34,12 @@ App.InstaMapView = App.MapView.extend({
 		this.searchPin.addTo(this.mapModule.map);
 		this.searchPin.on('searchPin:dragEnd', this.searchPinDragEnd, this);
 
-		this.searchRadius = new App.SearchRadius({ location: e.latlng, searchPin: this.searchPin, radius: 2500 });
+		this.searchRadius = new App.SearchRadius({ searchPin: this.searchPin, radius: 2500 });
 		this.searchRadius.addTo(this.mapModule.map);
 	},
 
 	searchPinDragEnd: function(e) {
 		console.log(e);
-		console.log(this.searchRadius.get('radius'));
+		console.log(this.searchRadius.radius());
 	},
 });
