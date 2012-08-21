@@ -1,5 +1,5 @@
-var App = App || {};
-
-App.vent = _.extend({}, Backbone.Events, {
-	//aggregator methods:
-});
+(function(module){
+	module.vent = _.extend({}, Backbone.Events, {
+		//aggregator methods:
+	});
+})(instamapper.module("VentModule"));

@@ -1,129 +1,130 @@
-var App = App || {};
+(function(module){
 
-//Abstracts:
-App.Feature = Backbone.Model.extend({
-	addTo: function(map) {
-		this.feature.addTo(map);
-	},
-});
+	var vent = instamapper.module('VentModule').vent;
 
-App.Layer = Backbone.Collection.extend({
-	model: App.Feature,
-});
+	//=================Module==================
+	module.MapModle = Backbone.Model.extend({
+		map: null,
+		layers: [],
 
-//App classes:
-App.SearchPin = App.Feature.extend({
-	initialize: function(location) {
-		_.bindAll(this);
-		this.feature = new L.marker(location, 
-			{ icon: new L.divIcon({className: 'search-radius-grabber'}), draggable : true });
+		defaultBaseLayer: {
+			url: 'http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png',
+			data: { key: "721f5fe14d2a4ae5bf8ecb6412263ce2",
+					styleId: 22677 }
+		},
 
-		this.feature.on('dragend', this.dragEnd);
-		this.feature.on('drag', this.onDrag);
-	},
+		initialize: function(options) {
+			console.log('init map module...');
+			_.bindAll(this);
 
-	onDrag: function(e) {
-		this.trigger('searchPin:drag', e.target._latlng);
-	},
+			//do these belong here? or in calling code?
+			vent.on('map:createMap', this.createMap, module);
+			vent.on('map:locate', this.locate, module);
 
-	dragEnd: function(e) {
-		this.trigger('searchPin:dragEnd', e.target._latlng);
-	},
+			//would be nice if you could pass in an array of events/method names, like
+			//events ['map:createMap' : 'createMap']
+			//also, need some way of unbinding stuff....
+		},
 
-	getLocation: function() {
-		return this.feature.getLatLng();
-	}
-});
+		createMap: function(element, initialView) {
+			this.map = L.map(element).setView(initialView.coords, initialView.zoom);
+			this.addBaseLayer();
+			return this.map;
+		},
 
-App.SearchRadius = App.Feature.extend({
-	pathOptions: {
-		color: '#524B4E',
-		weight: 2,
-		opacity: 0.5,
-		fillOpacity: 0,
-		clickable: false
-	},
+		addBaseLayer: function() {
+			this.addLayer(this.getDefaultBaseLayer());
+		},
 
-	initialize: function(options) {
-		_.bindAll(this);
-		this.searchPin = options.searchPin;
-		this.feature = new L.Circle(this.searchPin.getLocation(), options.radius, this.pathOptions);
-		this.searchPin.on('searchPin:drag', this.onDrag, this);
-	},
+		getDefaultBaseLayer: function() {
+			return L.tileLayer(this.defaultBaseLayer.url, this.defaultBaseLayer.data);
+		},
 
-	onDrag: function(location) {
-		this.feature.setLatLng(location);
-	},
+		addLayer: function(layer) {
+			this.map.addLayer(layer);
+		},
 
-	radius: function() {
-		return this.feature.getRadius();
-	}
-});
+		locate: function(options) {
+			this.map.locate({ setView: true, maxZoom: options.zoom });
+			this.map.on('locationfound', 
+				function(e) { vent.trigger('map:finishedLocate', e); });
 
-App.Picture = App.Feature.extend({
+			this.map.on('locationerror', 
+				function(e) { vent.trigger('map:locateError', e); });
+		},
+	});
 
-});
+	module.InstaMapperModle = module.MapModle.extend({
+		getDefaultBaseLayer: function() {
+			return new L.StamenTileLayer('toner');
+		},
+	});
 
-App.PictureLayer = App.Layer.extend({
+	//=================Abstracts==================
+	module.Feature = Backbone.Model.extend({
+		addTo: function(map) {
+			this.feature.addTo(map);
+		},
+	});
 
-});
+	module.Layer = Backbone.Collection.extend({
+		model: module.Feature,
+	});
 
+	//=================Abstracts==================
+	module.SearchPin = module.Feature.extend({
+		initialize: function(location) {
+			_.bindAll(this);
+			this.feature = new L.marker(location, 
+				{ icon: new L.divIcon({className: 'search-radius-grabber'}), draggable : true });
 
+			this.feature.on('dragend', this.dragEnd);
+			this.feature.on('drag', this.onDrag);
+		},
 
-//App modules:
-App.MapModule = Backbone.Model.extend({
-	map: null,
-	layers: [],
+		onDrag: function(e) {
+			this.trigger('searchPin:drag', e.target._latlng);
+		},
 
-	defaultBaseLayer: {
-		url: 'http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png',
-		data: { key: "721f5fe14d2a4ae5bf8ecb6412263ce2",
-				styleId: 22677 }
-	},
+		dragEnd: function(e) {
+			this.trigger('searchPin:dragEnd', e.target._latlng);
+		},
 
-	initialize: function(options) {
-		console.log('init map module...');
-		_.bindAll(this);
+		getLocation: function() {
+			return this.feature.getLatLng();
+		}
+	});
 
-		//do these belong here? or in calling code?
-		App.vent.on('map:createMap', this.createMap, App.mapModule);
-		App.vent.on('map:locate', this.locate, App.mapModule);
+	module.SearchRadius = module.Feature.extend({
+		pathOptions: {
+			color: '#524B4E',
+			weight: 2,
+			opacity: 0.5,
+			fillOpacity: 0,
+			clickable: false
+		},
 
-		//would be nice if you could pass in an array of events/method names, like
-		//events ['map:createMap' : 'createMap']
-		//also, need some way of unbinding stuff....
-	},
+		initialize: function(options) {
+			_.bindAll(this);
+			this.searchPin = options.searchPin;
+			this.feature = new L.Circle(this.searchPin.getLocation(), options.radius, this.pathOptions);
+			this.searchPin.on('searchPin:drag', this.onDrag, this);
+		},
 
-	createMap: function(element, initialView) {
-		this.map = L.map(element).setView(initialView.coords, initialView.zoom);
-		this.addBaseLayer();
-		return this.map;
-	},
+		onDrag: function(location) {
+			this.feature.setLatLng(location);
+		},
 
-	addBaseLayer: function() {
-		this.addLayer(this.getDefaultBaseLayer());
-	},
+		radius: function() {
+			return this.feature.getRadius();
+		}
+	});
 
-	getDefaultBaseLayer: function() {
-		return L.tileLayer(this.defaultBaseLayer.url, this.defaultBaseLayer.data);
-	},
+	module.Picture = module.Feature.extend({
 
-	addLayer: function(layer) {
-		this.map.addLayer(layer);
-	},
+	});
 
-	locate: function(options) {
-		this.map.locate({ setView: true, maxZoom: options.zoom });
-		this.map.on('locationfound', 
-			function(e) { App.vent.trigger('map:finishedLocate', e); });
+	module.PictureLayer = module.Layer.extend({
 
-		this.map.on('locationerror', 
-			function(e) { App.vent.trigger('map:locateError', e); });
-	},
-});
-
-App.InstaMapperModule = App.MapModule.extend({
-	getDefaultBaseLayer: function() {
-		return new L.StamenTileLayer('toner');
-	},
-});
+	});
+})(instamapper.module("MapModule"))
