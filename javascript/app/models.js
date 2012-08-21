@@ -30,7 +30,7 @@ App.SearchPin = App.Feature.extend({
 		this.trigger('searchPin:dragEnd', e.target._latlng);
 	},
 
-	location: function() {
+	getLocation: function() {
 		return this.feature.getLatLng();
 	}
 });
@@ -47,7 +47,7 @@ App.SearchRadius = App.Feature.extend({
 	initialize: function(options) {
 		_.bindAll(this);
 		this.searchPin = options.searchPin;
-		this.feature = new L.Circle(this.searchPin.location(), options.radius, this.pathOptions);
+		this.feature = new L.Circle(this.searchPin.getLocation(), options.radius, this.pathOptions);
 		this.searchPin.on('searchPin:drag', this.onDrag, this);
 	},
 
