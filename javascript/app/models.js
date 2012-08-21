@@ -3,6 +3,8 @@
 	var vent = instamapper.module('VentModule').vent;
 
 	//=================Module==================
+	//Feel like I'm falling prey to the temptation to MODEL ALL THE THINGS... does the map handler really need to be a model, or
+	//can it just be a *module*? all it's really doing is acting like a facade for Leaflet....
 	module.MapModel = Backbone.Model.extend({
 		map: null,
 		layers: [],
@@ -74,7 +76,7 @@
 		model: module.Feature,
 	});
 
-	//=================Abstracts==================
+	//=================App Classes==================
 	module.SearchPin = module.Feature.extend({
 		initialize: function(location) {
 			_.bindAll(this);
@@ -175,7 +177,7 @@
 
 		url: function(location, radius){
 			//this needs a bit of cleanup. client ID is hard-coded, and all these parameters
-			//get set in kind of a stupid way. 
+			//get set in kind of a stupid way in the view.
 			return 'https://api.instagram.com/v1/media/search?lat=' + this.location.lat + '&lng=' + this.location.lng + '&distance=' + this.radius
 			+ "&client_id=" + 'ae4252c2e6bb4d0da14bfc091be17dc9'
 		},

@@ -6,6 +6,7 @@
 		el: "div#map",
 
 		initialize: function(options){
+			if (!options.mapModel) throw "MapView Error: Missing MapModel";
 			if (options.el)
 				this.setElement(options.el);
 
@@ -21,12 +22,12 @@
 
 	module.InstaMapView = module.MapView.extend({
 		initialize: function(options) {
+			if(!options.searchRadius) throw "InstaMapView Error: Missing SearchRadius";
 			module.MapView.prototype.initialize.call(this, options);
 			
-			vent.on('map:finishedLocate map:locateError', 
-				this.searchRadius, this);
-
+			vent.on('map:finishedLocate', this.placeSearchRadius, this);
 			vent.trigger('map:locate', { zoom: 12 });
+
 			this.searchRadius = options.searchRadius;
 			this.searchRadius.addTo(this.mapModel.map);
 			this.searchRadius.on('searchRadius:dragEnd', this.searchRadiusDragEnd, this)
@@ -37,7 +38,7 @@
 		},
 
 		searchRadiusDragEnd: function(e) {
-			//nasty, super hacky method. needs refactoring. ugh.
+			//nasty, super hacky method. needs refactoring. ugh. gross.
 			var that = this;
 			this.collection.radius   = this.searchRadius.radius();
 			this.collection.location = e;
