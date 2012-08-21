@@ -13,6 +13,8 @@ var instamapper = {
 }
 
 $(document).ready(function() {
-	var RouterModule = instamapper.module("RouterModule");
-	new RouterModule.Router();
+	var app = instamapper;
+	var Router = instamapper.module("RouterModule").Router;
+	
+	app.router = new Router();
 });

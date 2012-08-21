@@ -121,6 +121,7 @@
 	});
 
 	module.Picture = module.Feature.extend({
+		//eeewwwwwww.... gotta clean this up
 		initialize: function(options) {
 			if (options.location) {
 				this.location = new L.LatLng(options.location.latitude, options.location.longitude)
@@ -130,7 +131,7 @@
 							iconUrl:options.images.thumbnail.url, 
 							className:'photo',
 							iconAnchor: new L.Point(),
-							iconSize: new L.Point(45, 45)
+							iconSize: new L.Point(50, 50)
 						}),
 						draggable: true
 				});

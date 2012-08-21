@@ -19,4 +19,7 @@ html, body, #map {
 .photo {
 	width: 100px;
 	height: 100px;
+	-moz-border-radius: 10em;
+	-webkit-border-radius: 10em;
+	border-radius: 10em;
 }

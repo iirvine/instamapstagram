@@ -13,7 +13,8 @@
 			this.mapModule = options.mapModule;
 
 			//I'm sort of liking the app level events, but they also seem like a bit of a code
-			//smell... maybe a bit more logic in the event aggregator? 
+			//smell, just hooking up callbacks and lobbing events all over the place... 
+			//maybe a bit more logic in the event aggregator?  
 			vent.trigger('map:createMap', this.el, options.defaultView);
 		},
 	});
@@ -41,8 +42,8 @@
 		},
 
 		searchPinDragEnd: function(e) {
+			//nasty, super hacky method. needs refactoring. ugh.
 			var that = this;
-			console.log(e);
 			this.collection.location = e;
 			this.collection.radius   = this.searchRadius.radius();
 			this.collection.fetch({ success: function(response) 
