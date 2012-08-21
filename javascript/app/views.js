@@ -34,7 +34,7 @@
 		},
 
 		placeSearchRadius: function(e) {
-			this.searchRadius.moveTo(this.mapModel.map.getCenter());
+			this.searchRadius.moveTo(e.latlng);
 		},
 
 		searchRadiusDragEnd: function(e) {
