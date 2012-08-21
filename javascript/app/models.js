@@ -125,13 +125,15 @@
 			if (options.location) {
 				this.location = new L.LatLng(options.location.latitude, options.location.longitude)
 				this.feature = new L.Marker(this.location, 
-					{ icon: new L.Icon({ 
-						iconUrl:options.images.thumbnail.url, 
-						draggable: true, 
-						className:'photo',
-						iconAnchor: new L.Point(),
-						iconSize: new L.Point(45, 45) 
-					})});
+					{ icon: new L.Icon(
+						{ 
+							iconUrl:options.images.thumbnail.url, 
+							className:'photo',
+							iconAnchor: new L.Point(),
+							iconSize: new L.Point(45, 45)
+						}),
+						draggable: true
+				});
 			}
 		},
 	});
