@@ -121,10 +121,42 @@
 	});
 
 	module.Picture = module.Feature.extend({
-
+		initialize: function(options) {
+			if (options.location) {
+				this.location = new L.LatLng(options.location.latitude, options.location.longitude)
+				this.feature = new L.Marker(this.location, 
+					{ icon: new L.Icon({ 
+						iconUrl:options.images.thumbnail.url, 
+						draggable: true, 
+						className:'photo',
+						iconAnchor: new L.Point(),
+						iconSize: new L.Point(45, 45) 
+					})});
+			}
+		},
 	});
 
 	module.PictureLayer = module.Layer.extend({
+		model: module.Picture,
 
+		sync: function(method, modle, options) {
+			var params = _.extend({
+				type: 'GET',
+				dataType: 'jsonp',
+				url: this.url(),
+				jsonp: 'callback'
+			}, options);
+			return $.ajax(params);
+		},
+
+		url: function(location, radius){
+			return 'https://api.instagram.com/v1/media/search?lat=' + this.location.lat + '&lng=' + this.location.lng + '&distance=' + this.radius
+			+ "&client_id=" + 'ae4252c2e6bb4d0da14bfc091be17dc9'
+		},
+
+		parse: function(response) {
+			return response.data;
+		},
 	});
+
 })(instamapper.module("MapModule"))

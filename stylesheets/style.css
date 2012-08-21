@@ -15,3 +15,8 @@ html, body, #map {
 	-webkit-border-radius: 10em;
 	border-radius: 10em;	
 }
+
+.photo {
+	width: 100px;
+	height: 100px;
+}

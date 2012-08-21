@@ -41,8 +41,12 @@
 		},
 
 		searchPinDragEnd: function(e) {
+			var that = this;
 			console.log(e);
-			console.log(this.searchRadius.radius());
+			this.collection.location = e;
+			this.collection.radius   = this.searchRadius.radius();
+			this.collection.fetch({ success: function(response) 
+				{ that.collection.forEach(function(picture) { picture.addTo(that.mapModule.map) }); }});
 		},
 	});
 })(instamapper.module("MapViewModule"));
