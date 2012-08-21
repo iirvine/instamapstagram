@@ -7,11 +7,14 @@
 			"": "index"
 		},
 
+		defaultCoords: [37.8, -96],
+
 		initialize: function() {	
 			this.mapView = new MapViewModule.InstaMapView({
-				mapModule: new MapModule.InstaMapperModle(),
-				collection: new MapModule.PictureLayer(),
-				defaultView: { coords: [37.8, -96], zoom: 4 },
+				mapModel    : new MapModule.InstaMapperModel(),
+				collection  : new MapModule.PictureLayer(),
+				searchRadius: new MapModule.SearchRadius({ location: this.defaultCoords, radius: 2500 }),
+				defaultView: { coords: this.defaultCoords, zoom: 4 },
 			});
 		},
 	});

@@ -10,7 +10,7 @@
 				this.setElement(options.el);
 
 			//saving a reference to mapModule, just for convenience. 
-			this.mapModule = options.mapModule;
+			this.mapModel = options.mapModel;
 
 			//I'm sort of liking the app level events, but they also seem like a bit of a code
 			//smell, just hooking up callbacks and lobbing events all over the place... 
@@ -24,30 +24,25 @@
 			module.MapView.prototype.initialize.call(this, options);
 			
 			vent.on('map:finishedLocate map:locateError', 
-				this.placeLocationPin, this);
+				this.searchRadius, this);
 
 			vent.trigger('map:locate', { zoom: 12 });
+			this.searchRadius = options.searchRadius;
+			this.searchRadius.addTo(this.mapModel.map);
+			this.searchRadius.on('searchRadius:dragEnd', this.searchRadiusDragEnd, this)
 		},
 
-		placeLocationPin: function(e) {
-			//place pin at default view's center if locationerror
-			e.type !== 'locationerror' ? this.searchPin = new MapModule.SearchPin(e.latlng)
-			: this.searchPin = new MapModule.SearchPin(this.mapModule.map.getCenter())
-
-			this.searchPin.addTo(this.mapModule.map);
-			this.searchPin.on('searchPin:dragEnd', this.searchPinDragEnd, this);
-
-			this.searchRadius = new MapModule.SearchRadius({ searchPin: this.searchPin, radius: 2500 });
-			this.searchRadius.addTo(this.mapModule.map);
+		placeSearchRadius: function(e) {
+			this.searchRadius.moveTo(this.mapModel.map.getCenter());
 		},
 
-		searchPinDragEnd: function(e) {
+		searchRadiusDragEnd: function(e) {
 			//nasty, super hacky method. needs refactoring. ugh.
 			var that = this;
-			this.collection.location = e;
 			this.collection.radius   = this.searchRadius.radius();
+			this.collection.location = e;
 			this.collection.fetch({ success: function(response) 
-				{ that.collection.forEach(function(picture) { picture.addTo(that.mapModule.map) }); }});
+				{ that.collection.forEach(function(picture) { picture.addTo(that.mapModel.map) }); }});
 		},
 	});
 })(instamapper.module("MapViewModule"));

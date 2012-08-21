@@ -14,7 +14,7 @@ var instamapper = {
 
 $(document).ready(function() {
 	var app = instamapper;
-	var Router = instamapper.module("RouterModule").Router;
+	var Router = app.module("RouterModule").Router;
 	
 	app.router = new Router();
 });

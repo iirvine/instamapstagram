@@ -3,7 +3,7 @@
 	var vent = instamapper.module('VentModule').vent;
 
 	//=================Module==================
-	module.MapModle = Backbone.Model.extend({
+	module.MapModel = Backbone.Model.extend({
 		map: null,
 		layers: [],
 
@@ -14,7 +14,6 @@
 		},
 
 		initialize: function(options) {
-			console.log('init map module...');
 			_.bindAll(this);
 
 			//do these belong here? or in calling code?
@@ -54,7 +53,7 @@
 		},
 	});
 
-	module.InstaMapperModle = module.MapModle.extend({
+	module.InstaMapperModel = module.MapModel.extend({
 		getDefaultBaseLayer: function() {
 			return new L.StamenTileLayer('toner');
 		},
@@ -62,6 +61,10 @@
 
 	//=================Abstracts==================
 	module.Feature = Backbone.Model.extend({
+		moveTo: function(location){
+			this.feature.setLatLng(location);
+		},
+
 		addTo: function(map) {
 			this.feature.addTo(map);
 		},
@@ -106,34 +109,52 @@
 
 		initialize: function(options) {
 			_.bindAll(this);
-			this.searchPin = options.searchPin;
+			//sort of a hack. paths aren't draggable out of the box in leaflet, so SearchRadius uses an internal marker 
+			//as a "grabber" and routes the drag and dragEnd events back to the view
+			this.searchPin = new module.SearchPin(options.location);
 			this.feature = new L.Circle(this.searchPin.getLocation(), options.radius, this.pathOptions);
 			this.searchPin.on('searchPin:drag', this.onDrag, this);
+			this.searchPin.on('searchPin:dragEnd', this.onDragEnd, this);
 		},
 
 		onDrag: function(location) {
 			this.feature.setLatLng(location);
 		},
 
+		onDragEnd: function(e){
+			this.trigger('searchRadius:dragEnd', e);
+		},
+
 		radius: function() {
 			return this.feature.getRadius();
-		}
+		},
+
+		moveTo: function(location) {
+			this.searchPin.moveTo(location);
+			this.feature.setLatLng(location);
+		},
+
+		addTo: function(map){
+			module.Feature.prototype.addTo.call(this, map);
+			this.searchPin.addTo(map);
+		},
 	});
 
 	module.Picture = module.Feature.extend({
-		//eeewwwwwww.... gotta clean this up
+		getIcon: function (url) {
+			return new L.Icon({
+				iconUrl: url, 
+				className:'photo',
+				iconAnchor: new L.Point(),
+				iconSize: new L.Point(50, 50)});
+		},
+
 		initialize: function(options) {
 			if (options.location) {
 				this.location = new L.LatLng(options.location.latitude, options.location.longitude)
-				this.feature = new L.Marker(this.location, 
-					{ icon: new L.Icon(
-						{ 
-							iconUrl:options.images.thumbnail.url, 
-							className:'photo',
-							iconAnchor: new L.Point(),
-							iconSize: new L.Point(50, 50)
-						}),
-						draggable: true
+				this.feature = new L.Marker(this.location, { 
+					icon: this.getIcon(options.images.thumbnail.url), 
+					draggable: true 
 				});
 			}
 		},
@@ -153,6 +174,8 @@
 		},
 
 		url: function(location, radius){
+			//this needs a bit of cleanup. client ID is hard-coded, and all these parameters
+			//get set in kind of a stupid way. 
 			return 'https://api.instagram.com/v1/media/search?lat=' + this.location.lat + '&lng=' + this.location.lng + '&distance=' + this.radius
 			+ "&client_id=" + 'ae4252c2e6bb4d0da14bfc091be17dc9'
 		},
