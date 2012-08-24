@@ -18,18 +18,17 @@
 		initialize: function(options) {
 			_.bindAll(this);
 
-			//do these belong here? or in calling code?
-			vent.on('map:createMap', this.createMap, module);
-			vent.on('map:locate', this.locate, module);
-
+			//do these event hook ups belong here? or in calling code?
 			//would be nice if you could pass in an array of events/method names, like
 			//events ['map:createMap' : 'createMap']
 			//also, need some way of unbinding stuff....
+			vent.on('map:createMap', this.createMap, module);
 		},
 
 		createMap: function(element, initialView) {
 			this.map = L.map(element).setView(initialView.coords, initialView.zoom);
 			this.addBaseLayer();
+			vent.trigger('map:ready');
 			return this.map;
 		},
 
@@ -44,18 +43,24 @@
 		addLayer: function(layer) {
 			this.map.addLayer(layer);
 		},
-
-		locate: function(options) {
-			this.map.locate({ setView: true, maxZoom: options.zoom });
-			this.map.on('locationfound', 
-				function(e) { vent.trigger('map:finishedLocate', e); });
-
-			this.map.on('locationerror', 
-				function(e) { vent.trigger('map:locateError', e); });
-		},
 	});
 
 	module.InstaMapperModel = module.MapModel.extend({
+		initialize: function(options) {
+			module.MapModel.prototype.initialize.call(this, options);
+			vent.on('map:ready', this.onMapReady, this);
+		},
+
+		onMapReady: function() {
+			this.addControl(new L.Control.Locate());
+			this.map.on('locationfound', function(e) { vent.trigger('map:finishedLocate', e); });
+			this.map.on('locationerror', function(e) { vent.trigger('map:locateError', e); });
+		},
+
+		addControl: function(control) {
+			this.map.addControl(control);
+		},
+
 		getDefaultBaseLayer: function() {
 			return new L.StamenTileLayer('toner');
 		},

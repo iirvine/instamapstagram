@@ -26,8 +26,6 @@
 			module.MapView.prototype.initialize.call(this, options);
 			
 			vent.on('map:finishedLocate', this.placeSearchRadius, this);
-			vent.trigger('map:locate', { zoom: 12 });
-
 			this.searchRadius = options.searchRadius;
 			this.searchRadius.addTo(this.mapModel.map);
 			this.searchRadius.on('searchRadius:dragEnd', this.searchRadiusDragEnd, this)
