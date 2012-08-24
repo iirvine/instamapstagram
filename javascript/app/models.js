@@ -27,8 +27,8 @@
 
 		createMap: function(element, initialView) {
 			this.map = L.map(element).setView(initialView.coords, initialView.zoom);
+			this.map.on('load', vent.trigger('map:ready'));
 			this.addBaseLayer();
-			vent.trigger('map:ready');
 			return this.map;
 		},
 
@@ -46,6 +46,8 @@
 	});
 
 	module.InstaMapperModel = module.MapModel.extend({
+		popupContent: '<p>Drag me!</p>',
+
 		initialize: function(options) {
 			module.MapModel.prototype.initialize.call(this, options);
 			vent.on('map:ready', this.onMapReady, this);
@@ -63,6 +65,10 @@
 
 		getDefaultBaseLayer: function() {
 			return new L.StamenTileLayer('toner');
+		},
+
+		showInitPopup: function(location) {
+			this.map.openPopup(L.popup().setContent(this.popupContent).setLatLng(location));
 		},
 	});
 
@@ -145,6 +151,10 @@
 		addTo: function(map){
 			module.Feature.prototype.addTo.call(this, map);
 			this.searchPin.addTo(map);
+		},
+
+		getLocation: function() {
+			return this.searchPin.getLocation();
 		},
 	});
 

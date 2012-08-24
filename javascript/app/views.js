@@ -24,15 +24,19 @@
 		initialize: function(options) {
 			if(!options.searchRadius) throw "InstaMapView Error: Missing SearchRadius";
 			module.MapView.prototype.initialize.call(this, options);
-			
+
 			vent.on('map:finishedLocate', this.placeSearchRadius, this);
+
 			this.searchRadius = options.searchRadius;
 			this.searchRadius.addTo(this.mapModel.map);
-			this.searchRadius.on('searchRadius:dragEnd', this.searchRadiusDragEnd, this)
+			this.searchRadius.on('searchRadius:dragEnd', this.searchRadiusDragEnd, this);
+
+			this.mapModel.showInitPopup(this.searchRadius.getLocation());
 		},
 
 		placeSearchRadius: function(e) {
 			this.searchRadius.moveTo(e.latlng);
+			this.searchRadiusDragEnd(e.latlng);
 		},
 
 		searchRadiusDragEnd: function(e) {
