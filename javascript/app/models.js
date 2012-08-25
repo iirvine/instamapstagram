@@ -18,7 +18,7 @@
 		initialize: function(options) {
 			_.bindAll(this);
 
-			//do these event hook ups belong here? or in calling code?
+			//do event hook ups belong here? or in calling code?
 			//would be nice if you could pass in an array of events/method names, like
 			//events ['map:createMap' : 'createMap']
 			//also, need some way of unbinding stuff....
@@ -68,7 +68,16 @@
 		},
 
 		showInitPopup: function(location) {
-			this.map.openPopup(L.popup().setContent(this.popupContent).setLatLng(location));
+			this.map.openPopup(L.popup({
+				closeButton: false,
+				offset: L.point(2, 1)
+			}).setContent(this.popupContent).setLatLng(location));
+			vent.on('searchPin:drag', this.closePopup, this);
+		},
+
+		closePopup: function(){
+			this.map.closePopup();
+			vent.off('searchPin:drag', this.closePopup);
 		},
 	});
 
@@ -132,6 +141,7 @@
 
 		onDrag: function(location) {
 			this.feature.setLatLng(location);
+			vent.trigger('searchPin:drag');
 		},
 
 		onDragEnd: function(e){
