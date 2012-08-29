@@ -78,7 +78,6 @@
 		closePopup: function(){
 			this.map.closePopup();
 			vent.off('searchPin:drag', this.closePopup);
-			//bluh.
 		},
 	});
 

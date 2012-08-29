@@ -33,13 +33,13 @@ html, body, #map {
 	-moz-border-radius: 7px;
 	-webkit-border-radius: 7px;
 	border-radius: 7px;
-	padding: 5px;
+	padding: 4px;
 }
 
 .leaflet-control-locate a {
 	background-position: 50% 50%;
-	width: 19px;
-	height: 19px;
+	width: 16px;
+	height: 17px;
 	background-repeat: no-repeat;
 	display: block;
 	background-image: url(../assets/location.png);
