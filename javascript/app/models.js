@@ -169,6 +169,12 @@
 	});
 
 	module.Picture = module.Feature.extend({
+		popupTemplate: _.template([
+			"<a target=_blank href=<%=link%>>", 
+			"<img src=<%=images.thumbnail.url%>></img>",
+			"</a>"
+			].join('')),
+
 		getIcon: function (url) {
 			return new L.Icon({
 				iconUrl: url, 
@@ -183,6 +189,10 @@
 				this.feature = new L.Marker(this.location, { 
 					icon: this.getIcon(options.images.thumbnail.url), 
 					draggable: true 
+				});
+				this.feature.bindPopup(this.popupTemplate(options), { 
+					closeButton:false,
+					offset: L.point(22,7) 
 				});
 			}
 		},
